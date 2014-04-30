@@ -9,7 +9,7 @@ class ec2utils::ocf-elasticip(
 )
 {
   file { '/usr/lib/ocf/resource.d/ec2/':
-    ensure => present,
+    ensure => 'directory',
   }
 
   file { '/usr/lib/ocf/resource.d/ec2/elastic-ip':
@@ -18,7 +18,6 @@ class ec2utils::ocf-elasticip(
     mode    => '0755',
     owner   => '0',
     require => Package['ec2-api-tools'],
-
   }
 
 }
