@@ -54,7 +54,9 @@ END
 }
 
 ip_already_associated() {
-  if [ `ec2-describe-addresses | grep "$ELASTIC_IP" | awk '{print $3}'` = "$AWS_INSTANCE_ID" ]; then
+  CURRENT_INSTANCE_ID=`ec2-describe-addresses | grep "$ELASTIC_IP" | awk '{print $3}'`
+  echo $CURRENT_INSTANCE_ID
+  if [ "$CURRENT_INSTANCE_ID" = "$AWS_INSTANCE_ID" ]; then
       ocf_log info "Elastic IP address already associated to the node"
     return $OCF_SUCCESS
   else
@@ -125,14 +127,15 @@ ip_monitor() {
   ip_validate_all || exit $?
 
   if ip_already_associated; then
-    ping -c 1 $ELASTIC_IP > /dev/null
-    if [ $? -eq 0 ]; then
-      ocf_log info "Elastic IP responding to ping test, resource test sucessful"
-      return $OCF_SUCCESS
-    else
-      ocf_log err "Elastic IP not responding to ping test, resource test failed"
-      return $OCF_ERR_GENERIC
-    fi
+    ocf_log info "IP associated, pingtest disabled due to firewall rules" 
+    #ping -c 1 $ELASTIC_IP > /dev/null
+    #if [ $? -eq 0 ]; then
+    #  ocf_log info "Elastic IP responding to ping test, resource test sucessful"
+    #  return $OCF_SUCCESS
+    #else
+    #  ocf_log err "Elastic IP not responding to ping test, resource test failed"
+    #  return $OCF_ERR_GENERIC
+    #fi
   else
   ocf_log debug "Resource not running"
   return $OCF_NOT_RUNNING
