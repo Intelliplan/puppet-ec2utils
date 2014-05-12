@@ -14,6 +14,7 @@ export EC2_URL=<%= @ec2_url %>
 # needed for moving the IP
 AWS_INSTANCE_ID="<%= @aws_instance_id %>"  # different for each node, ex: i-xxxxxxxx
 ELASTIC_IP="<%= @elastic_ip %>"  # ex: 174.129.253.XXX
+ALLOCATION_ID="<%= @allocation_id %>" 
 ###############################################################################
 
 
@@ -55,7 +56,7 @@ END
 
 ip_already_associated() {
   CURRENT_INSTANCE_ID=`ec2-describe-addresses | grep "$ELASTIC_IP" | awk '{print $3}'`
-  echo $CURRENT_INSTANCE_ID
+  # echo $CURRENT_INSTANCE_ID
   if [ "$CURRENT_INSTANCE_ID" = "$AWS_INSTANCE_ID" ]; then
       ocf_log info "Elastic IP address already associated to the node"
     return $OCF_SUCCESS
@@ -76,9 +77,9 @@ ip_start() {
   # We are in a VPC, different parameters are needed
   # ec2-associate-address "$ELASTIC_IP" -i "$AWS_INSTANCE_ID" > /dev/null
    
-  # First we need to figureout the current ALLOCATION_ID of the public IP.
-  ALLOCATION_ID=`ec2-describe-addresses   | grep "$ELASTIC_IP"  | awk '{print $4}'`
-  ec2-associate-address -a "$ALLOCATION_ID" -i "$AWS_INSTANCE_ID" > /dev/null
+
+  # Association ID now is static and predefined"
+  ec2-associate-address -a "$ALLOCATION_ID" -i "$AWS_INSTANCE_ID" --allow-reassociation > /dev/null
   if [ $? -eq 1 ]; then
     ocf_log info "An error occurred when starting the resource"
     return $OCF_ERR_GENERIC

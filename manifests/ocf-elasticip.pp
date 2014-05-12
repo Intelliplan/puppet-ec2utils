@@ -6,6 +6,7 @@ class ec2utils::ocf-elasticip(
   $ec2_url = 'https://eu-west-1.ec2.amazonaws.com',
   $aws_instance_id = 'your_id',
   $elastic_ip = '127.0.0.1',
+  $allocation_id = 'ffffff',
 )
 {
   file { '/usr/lib/ocf/resource.d/ec2/':
